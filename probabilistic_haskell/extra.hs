@@ -56,7 +56,6 @@ chMem :: Vars -> Double -> (Vars -> Double) -> (Vars -> Double)
 chMem x r m = \a -> if a /= x then m a else r
 
 -- Define the semantics of ProgTerms using the MaybeT and Dist monads
--- Define the semantics of ProgTerms using the MaybeT and Dist monads
 psem :: ProgTerm -> (Vars -> Double) -> Dist (Maybe (Vars -> Double))
 psem (Asg x t) m = return (Just (chMem x (sem t m) m))
 psem (Seq p q) m = do
@@ -139,6 +138,25 @@ teste = Wh lexx (Seq xMaisy yMaisUm)
 teste_p = Prob xMaisy 10 yMaisUm
 
 
+-- Function to test the behavior of 'div2'
+testDiv :: Dist (Maybe Double)
+testDiv = do
+  x <- uniform [1, 2, 3]
+  y <- uniform [0, 1, 2, 3]
+  div2 x y
+
+-- Test function for the if-else statement
+testIfElse :: ProgTerm
+testIfElse = Ife (Leq (Leaf (Left X)) (Leaf (Right 10))) (Asg Y (Leaf (Right 1))) (Asg Y (Leaf (Right 0)))
+
+-- Test function for the probabilistic choice statement
+testProbChoice :: ProgTerm
+testProbChoice = Prob (Asg X (Leaf (Right 1))) 0.2 (Asg X (Leaf (Right 2)))
+
+-- Test function for the while loop
+testWhile :: ProgTerm
+testWhile = Wh (Leq (Leaf (Left X)) (Leaf (Right 10)) ) (Asg X (Plus (Leaf (Left X)) (Leaf (Right 1))))
+-- This function should increment X until it reaches 10
 
 
 
