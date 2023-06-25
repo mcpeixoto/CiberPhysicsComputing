@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE nta PUBLIC '-//Uppaal Team//DTD Flat System 1.1//EN' 'http://www.it.uu.se/research/group/darts/uppaal/flat-1_2.dtd'>
+<nta>
+	<declaration>
+
+const int N = 2;        
+typedef int[0,N-1] id_t;
+
+chan request[N], wait[N], gone[N];
+urgent chan go[N];
+</declaration>
+	<template>
+		<name x="43" y="17">Plane</name>
+		<parameter>const id_t id</parameter>
+		<declaration>clock t;</declaration>
+		<location id="id0" x="476" y="374">
+			<name x="493" y="357">Flying</name>
+		</location>
+		<location id="id1" x="272" y="272" color="#ffa500">
+			<name x="238" y="230">WaitQueue2</name>
+		</location>
+		<location id="id2" x="136" y="374" color="#ffa500">
+			<name x="60" y="357">Landing</name>
+			<label kind="invariant" x="77" y="374">t&lt;=6</label>
+		</location>
+		<location id="id3" x="306" y="374" color="#ffa500">
+			<name x="281" y="391">Flying2</name>
+			<label kind="invariant" x="289" y="408">t&lt;=10</label>
+		</location>
+		<location id="id4" x="170" y="272" color="#ffa500">
+			<label kind="invariant" x="153" y="238">t&lt;= 7</label>
+		</location>
+		<location id="id5" x="136" y="510">
+			<name x="68" y="502">Parked</name>
+		</location>
+		<location id="id6" x="340" y="612" color="#00ff00">
+			<name x="306" y="638">WaitQueue</name>
+		</location>
+		<location id="id7" x="476" y="510" color="#00ff00">
+			<name x="493" y="493">TakingOff</name>
+			<label kind="invariant" x="493" y="510">t&lt;=3</label>
+		</location>
+		<location id="id8" x="306" y="510" color="#00ff00">
+			<name x="272" y="459">Parked2</name>
+			<label kind="invariant" x="289" y="476">t&lt;=5</label>
+		</location>
+		<location id="id9" x="442" y="612" color="#00ff00">
+			<label kind="invariant" x="425" y="629">t&lt;= 7</label>
+		</location>
+		<location id="id10" x="391" y="510" color="#00ff00">
+			<name x="365" y="518">GoingFly</name>
+			<label kind="invariant" x="374" y="535">t&lt;=5</label>
+		</location>
+		<location id="id11" x="221" y="374" color="#ffa500">
+			<name x="195" y="340">GoingLand</name>
+			<label kind="invariant" x="204" y="391">t&lt;=5</label>
+		</location>
+		<init ref="id5"/>
+		<transition>
+			<source ref="id11"/>
+			<target ref="id2"/>
+			<label kind="guard" x="162" y="383">t == 5</label>
+			<label kind="assignment" x="170" y="400">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id10"/>
+			<target ref="id7"/>
+			<label kind="guard" x="408" y="468">t==5</label>
+			<label kind="assignment" x="408" y="485">t = 0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id11"/>
+			<label kind="guard" x="247" y="383">t&gt;=5</label>
+			<label kind="assignment" x="247" y="400">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id3"/>
+			<target ref="id1"/>
+			<label kind="guard" x="298" y="298">t&lt;=5</label>
+			<label kind="synchronisation" x="298" y="315">wait[id]?</label>
+		</transition>
+		<transition>
+			<source ref="id2"/>
+			<target ref="id5"/>
+			<label kind="guard" x="85" y="425">t&gt;=4</label>
+			<label kind="synchronisation" x="68" y="442">gone[id]!</label>
+		</transition>
+		<transition>
+			<source ref="id0"/>
+			<target ref="id3"/>
+			<label kind="synchronisation" x="374" y="332">request[id]!</label>
+			<label kind="assignment" x="374" y="349">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id4"/>
+			<target ref="id2"/>
+			<label kind="guard" x="119" y="298">t&gt;=5</label>
+			<label kind="assignment" x="119" y="315">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id1"/>
+			<target ref="id4"/>
+			<label kind="synchronisation" x="196" y="272">go[id]?</label>
+			<label kind="assignment" x="204" y="289">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id10"/>
+			<label kind="guard" x="340" y="468">t&gt;=5</label>
+			<label kind="assignment" x="340" y="485">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id8"/>
+			<target ref="id6"/>
+			<label kind="guard" x="272" y="553">t&lt;=5</label>
+			<label kind="synchronisation" x="264" y="570">wait[id]?</label>
+		</transition>
+		<transition>
+			<source ref="id7"/>
+			<target ref="id0"/>
+			<label kind="guard" x="485" y="417">t&gt;=1</label>
+			<label kind="synchronisation" x="485" y="434">gone[id]!</label>
+		</transition>
+		<transition>
+			<source ref="id5"/>
+			<target ref="id8"/>
+			<label kind="synchronisation" x="196" y="519">request[id]!</label>
+			<label kind="assignment" x="204" y="536">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id9"/>
+			<target ref="id7"/>
+			<label kind="guard" x="493" y="544">t&gt;=5</label>
+			<label kind="assignment" x="493" y="561">t=0</label>
+		</transition>
+		<transition>
+			<source ref="id6"/>
+			<target ref="id9"/>
+			<label kind="synchronisation" x="374" y="570">go[id]?</label>
+			<label kind="assignment" x="374" y="587">t=0</label>
+		</transition>
+	</template>
+	<template>
+		<name x="43" y="17">Controller</name>
+		<declaration>id_t list[N+1];
+int[0,N] len;
+
+// Put an element at the end of the queue
+void enqueue(id_t element)
+{
+        list[len++] = element;
+}
+
+// Remove the front element of the queue
+void dequeue()
+{
+        int i = 0;
+        len -= 1;
+        while (i &lt; len)
+        {
+                list[i] = list[i + 1];
+                i++;
+        }
+        list[i] = 0;
+}
+
+// Returns the front element of the queue
+id_t front()
+{
+   return list[0];
+}
+
+// Returns the last element of the queue
+id_t tail()
+{
+   return list[len - 1];
+}</declaration>
+		<location id="id12" x="272" y="238">
+			<name x="262" y="204">Occupied2</name>
+			<committed/>
+		</location>
+		<location id="id13" x="170" y="238">
+			<name x="187" y="229">Occupied</name>
+		</location>
+		<location id="id14" x="0" y="238">
+			<name x="17" y="204">Free</name>
+		</location>
+		<init ref="id14"/>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id12"/>
+			<label kind="select" x="195" y="153">e : id_t</label>
+			<label kind="synchronisation" x="195" y="170">request[e]?</label>
+			<label kind="assignment" x="195" y="187">enqueue(e)</label>
+			<nail x="204" y="204"/>
+			<nail x="238" y="204"/>
+		</transition>
+		<transition>
+			<source ref="id13"/>
+			<target ref="id14"/>
+			<label kind="select" x="51" y="59">e : id_t</label>
+			<label kind="guard" x="51" y="76">e == front()</label>
+			<label kind="synchronisation" x="51" y="93">gone[e]?</label>
+			<label kind="assignment" x="51" y="110">dequeue()</label>
+			<nail x="136" y="136"/>
+			<nail x="34" y="136"/>
+		</transition>
+		<transition>
+			<source ref="id12"/>
+			<target ref="id13"/>
+			<label kind="synchronisation" x="195" y="272">wait[tail()]!</label>
+			<nail x="238" y="272"/>
+			<nail x="204" y="272"/>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="guard" x="60" y="238">len &gt; 0</label>
+			<label kind="synchronisation" x="60" y="255">go[front()]!</label>
+		</transition>
+		<transition>
+			<source ref="id14"/>
+			<target ref="id13"/>
+			<label kind="select" x="60" y="349">e : id_t</label>
+			<label kind="guard" x="60" y="366">len == 0</label>
+			<label kind="synchronisation" x="60" y="383">request[e]?</label>
+			<label kind="assignment" x="60" y="400">enqueue(e)</label>
+			<nail x="34" y="340"/>
+			<nail x="136" y="340"/>
+		</transition>
+	</template>
+	<system>system Plane, Controller;
+</system>
+	<queries>
+		<query>
+			<formula>E&lt;&gt; not deadlock</formula>
+			<comment>Gate can receive (and store in queue) msg's from approaching trains.
+			</comment>
+		</query>
+		<query>
+			<formula>A[] forall (i : id_t) forall (j : id_t) (i != j) imply not((Plane(i).Landing | Plane(i).TakingOff) &amp;&amp; (Plane(j).Landing | Plane(j).TakingOff))</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Plane(1).Parked --&gt; Plane(1).Flying</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Plane(1).Flying --&gt;  Plane(1).Parked</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Plane(1).WaitQueue --&gt; Plane(1).Flying</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>Plane(1).WaitQueue2 --&gt; Plane(1).Parked</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Plane(1).GoingLand</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Plane(1).WaitQueue2</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Plane(1).GoingFly</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Plane(1).WaitQueue</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Controller.Occupied</formula>
+			<comment></comment>
+		</query>
+		<query>
+			<formula>E&lt;&gt; Controller.Occupied2</formula>
+			<comment></comment>
+		</query>
+	</queries>
+</nta>
