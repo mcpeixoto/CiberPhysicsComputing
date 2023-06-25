@@ -55,33 +55,21 @@ bsem (Conj b1 b2) e = bsem b1 e && bsem b2 e
 chMem :: Vars -> Double -> (Vars -> Double) -> (Vars -> Double)
 chMem x r m = \a -> if a /= x then m a else r
 
-
+-- Define the semantics of ProgTerms using the MaybeT and Dist monads
 -- Define the semantics of ProgTerms using the MaybeT and Dist monads
 psem :: ProgTerm -> (Vars -> Double) -> Dist (Maybe (Vars -> Double))
-
--- Evaluates an assignment statement by updating the memory with the result of evaluating the term.
 psem (Asg x t) m = return (Just (chMem x (sem t m) m))
-
--- Evaluates a sequence of programs by executing the first program, updating the memory,
--- and then executing the second program with the updated memory.
 psem (Seq p q) m = do
   m' <- psem p m
   case m' of
     Just m'' -> psem q m''
     Nothing -> return Nothing
-
--- Evaluates an if-else statement by evaluating the condition, and then executing either
--- the first program or the second program based on the condition's result.
 psem (Ife b p q) m = do
   v <- return (Just (bsem b m))
   case v of
     Just True -> psem p m
     Just False -> psem q m
     Nothing -> return Nothing
-
--- Evaluates a while loop by evaluating the condition, and if it's true,
--- executes the program inside the loop and repeats the process.
--- If the condition is false or the evaluation fails, the loop ends.
 psem (Wh b p) m = do
   v <- return (Just (bsem b m))
   case v of
@@ -92,9 +80,6 @@ psem (Wh b p) m = do
         Nothing -> return Nothing
     Just False -> return (Just m)
     Nothing -> return Nothing
-
--- Evaluates a probabilistic choice statement by evaluating both the true and false branches
--- and choosing one based on the given probability. The memory is passed to both branches.
 psem (Prob p r q) m
   | r < 0 || r > 1 = return Nothing
   | otherwise = do
@@ -103,6 +88,16 @@ psem (Prob p r q) m
       case (mp, mq) of
         (Just mp', Just mq') -> choose r mp mq
         _ -> return Nothing
+
+
+
+
+
+
+
+
+
+
 
 
 -- Defining the memory function (sigma) 
@@ -121,28 +116,31 @@ instance Show (Vars -> Double) where
                z = m Z in
                "X = " ++ show x ++ ", Y = " ++ show y ++ ", Z = " ++ show z
 
+x = Leaf (Left X)
+y = Leaf (Left Y)
+z = Leaf (Left Z)
 
--- Define the 'div' function
-div2 :: Double -> Double -> Dist (Maybe Double)
-div2 _ 0 = return Nothing
-div2 x y = return (Just (x / y))
+-- x + 2 * y
+t = Plus x (Mult 2 y)
 
--- Function to test the behavior of 'div2'
-testDiv :: Dist (Maybe Double)
-testDiv = do
-  x <- uniform [1, 2, 3]
-  y <- uniform [0, 1, 2, 3]
-  div2 x y
+-- wh x <= x do x=x+y; y=y+1
+-- x<=x -- BTerm
+lexx = Leq x x
 
--- Test function for the if-else statement
-testIfElse :: ProgTerm
-testIfElse = Ife (Leq (Leaf (Left X)) (Leaf (Right 10))) (Asg Y (Leaf (Right 1))) (Asg Y (Leaf (Right 0)))
 
--- Test function for the probabilistic choice statement
-testProbChoice :: ProgTerm
-testProbChoice = Prob (Asg X (Leaf (Right 1))) 0.2 (Asg X (Leaf (Right 2)))
+-- x=x+y -- ProgTerm
+xMaisy = (Asg X (Plus x y))
+-- y=y+1
+yMaisUm = Asg Y (Plus y (Leaf (Right 1)))
+-- wh x <= x do x=x+y; y=y+1
+teste = Wh lexx (Seq xMaisy yMaisUm) 
 
--- Test function for the while loop
-testWhile :: ProgTerm
-testWhile = Wh (Leq (Leaf (Left X)) (Leaf (Right 10)) ) (Asg X (Plus (Leaf (Left X)) (Leaf (Right 1))))
--- This function should increment X until it reaches 10
+-- Prob xMaisy 0.5 yMaisUM
+teste_p = Prob xMaisy 10 yMaisUm
+
+
+
+
+
+
+
