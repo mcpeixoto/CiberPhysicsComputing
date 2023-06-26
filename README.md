@@ -11,3 +11,8 @@ Note that the [Final Report](final_report.pdf) file contains final project repor
 <center>
 <img src="airport_uppal/demo.gif" label="Airport demo" caption="Airport demo"/>
 </center>
+
+## Course Information
+
+[Link to Course](https://lmf.di.uminho.pt/CyPhyComp2223/)
+
